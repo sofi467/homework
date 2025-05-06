@@ -14,7 +14,7 @@ LOGIN_INPUT = (By.XPATH, "//*[@id='responsive_page_template_content']//input[@ty
 PASSWORD_INPUT = (By.XPATH, "//*[@id='responsive_page_template_content']//input[@type = 'password']")
 CLC_LOGIN = (By.XPATH, "//*[@id='responsive_page_template_content']//button[@type = 'submit']")
 LOADIN_BUTTON = (By.XPATH, "//*[@id='responsive_page_template_content']//button//div[@class]")
-ERROR_MESSAGE = (By.XPATH, "//*[contains(text(), 'проверьте')]")
+ERROR_MESSAGE = (By.XPATH, "(//button[@type = 'submit']/following::*)[1][text() != '\u00A0']")
 
 fake = Faker()
 
@@ -39,14 +39,13 @@ class TestSteamLogin:
         WebDriverWait(browser, TIMEOUT).until(
             EC.element_to_be_clickable(CLC_LOGIN)).click()
         loading = WebDriverWait(browser, TIMEOUT).until(
-            EC.visibility_of_element_located(LOADIN_BUTTON)
-        )
+            EC.visibility_of_element_located(LOADIN_BUTTON))
         assert loading.is_displayed(), "Loading indicator is not displayed after submit"
 
         error_elem = WebDriverWait(browser, TIMEOUT).until(
             EC.visibility_of_element_located(ERROR_MESSAGE))
-        error_text = error_elem.text.lower()
+        error_text = error_elem.text
+
         assert "проверьте свой пароль и имя аккаунта и попробуйте снова" in error_text.lower(), (
             f"Expected error message to contain 'проверьте', but got: '{error_text}'"
-            # я сдаюсь, я не знаю к какому локатору привязаться, чтоб не было "проверьте"
         )
